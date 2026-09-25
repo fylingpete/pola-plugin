@@ -1,0 +1,12 @@
+{
+  "host": "claude-code",
+  "verified": "2026-09-19",
+  "verified_version": "2.1.109",
+  "install": "local plugin folder (--plugin-dir) or marketplace entry pointing to dist/claude",
+  "cli": "sh \"<plugin>/tools/pola\"",
+  "runtime": "node >= 18 from the host PATH; standalone binary only in the platform add-on package",
+  "paths": "host paths; the CLI reports real paths (e.g. /private/tmp for /tmp)",
+  "config": "~/.config/pola/root, override with POLA_CONFIG_DIR",
+  "hook": "SessionStart verified",
+  "write_gate": "released"
+}

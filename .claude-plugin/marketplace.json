@@ -1,0 +1,12 @@
+{
+  "name": "pola",
+  "owner": { "name": "Pola" },
+  "metadata": { "description": "The unpacked Pola package as its own marketplace, for a permanent install in Claude Code" },
+  "plugins": [
+    {
+      "name": "pola",
+      "source": "./",
+      "description": "Your own brain as a folder of Markdown files: set it up, fill it from your sources, ask it questions"
+    }
+  ]
+}

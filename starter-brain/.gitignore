@@ -1,0 +1,6 @@
+.DS_Store
+.obsidian/workspace*.json
+.trash/
+.brain/lock.*
+.brain/.pola-fs-probe*
+.pola-tools/

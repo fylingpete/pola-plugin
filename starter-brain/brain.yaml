@@ -1,0 +1,128 @@
+# brain.yaml — the map of this brain, for plugins and scripts.
+# It only describes where things are. Nothing private belongs in here.
+# The rules for the assistant are in BRAIN.md.
+brain_schema_version: 1
+
+owner:
+  name: "{{OWNER_NAME}}"
+  # The page that describes the owner. A card is later drafted from it.
+  me_page: pages/people/{{OWNER_SLUG}}.md
+
+pages:
+  root: pages
+  index: pages/index.md
+  log: pages/log.md
+  # The last section of a page: dated, sourced events below a line (see "Timeline" in BRAIN.md).
+  timeline_heading: "{{SECTION_TIMELINE}}"
+  # Closed type list, written as folder: type. It must match the table in BRAIN.md.
+  # Only the evolve-schema workflow changes it, and only with the owner's approval.
+  types:
+    people: person
+    companies: company
+    meetings: meeting
+    deals: deal
+    hiring: hiring
+    projects: project
+    org: org
+    writing: writing
+    media: media
+    concepts: concept
+    ideas: idea
+    household: household
+    personal: personal
+    inbox: inbox
+    archive: archive
+
+sources:
+  root: sources
+
+# What may ever leave this brain (see "Visibility" in BRAIN.md). private: never. network: may be
+# searched for requests from other people and feed the card draft; content only after release.
+# A page can deviate with `visibility:` in its frontmatter. Anything missing counts as private.
+visibility:
+  default: private
+  types:
+    people: network
+    companies: network
+    meetings: network
+    deals: private
+    hiring: private
+    projects: network
+    org: private
+    writing: network
+    media: network
+    concepts: network
+    ideas: network
+    household: private
+    personal: private
+    inbox: private
+    archive: private
+
+# Structured facts per type, checked as hints: text, list, contact, or a list of allowed values.
+frontmatter:
+  person:
+    role: text
+    orgs: list
+    aliases: list
+    contact: contact
+  company:
+    aliases: list
+  deal:
+    parties: list
+    status: [open, negotiating, signed, lost, paused]
+  hiring:
+    role: text
+    status: [open, interviewing, offer, filled, paused, closed]
+
+# How this brain is searched. The existing index is reused and a targeted text search covers
+# what the short index lines do not mention. Only registered adapters, never a command line.
+search:
+  adapter: markdown
+  index: pages/index.md
+  roots:
+    - pages
+    - sources
+
+people:
+  pages: "pages/people/*.md"
+  is_person:
+    field: type
+    equals: person
+  name_field: title
+  aliases_field: aliases
+
+# Where the facts about a person are found on a person page.
+# The section names follow the language of this brain (see BRAIN.md).
+fields:
+  strength:
+    from: relationship
+    map:
+      strong: 3
+      working: 2
+      loose: 1
+      cold: 0
+    default: 1
+  last_contact:
+    from: last_contact
+  can_help:
+    section: "{{SECTION_CAN_HELP}}"
+  how_we_met:
+    section: "{{SECTION_HOW_WE_MET}}"
+  known_by:
+    section: "{{SECTION_KNOWN_BY}}"
+  wants:
+    section: "{{SECTION_WANTS}}"
+
+about_me:
+  sources:
+    - pages/people/{{OWNER_SLUG}}.md
+    - "pages/projects/*.md"
+
+# What the owner tells the assistant in conversation is first saved word for word
+# as an accepted source excerpt in sources/pola/. Redacted excerpts use fidelity: redacted. The ingest workflow then works it into the pages.
+write:
+  mode: inbox
+  inbox_path: sources/pola/
+  source_label:
+    field: fidelity
+    value: verbatim

@@ -1,0 +1,65 @@
+#!/bin/sh
+# Launcher for the bundled Pola CLI. Invoke as: sh "<plugin>/tools/pola" <command> ...
+# (calling through sh keeps it working when an upload dropped the executable bit).
+#
+# Runtime order: a JavaScript runtime that is already present (node >= 18, then bun),
+# then a standalone binary shipped next to this file under bin/<os>-<arch>/.
+# Nothing is downloaded or installed. Without a runtime the launcher prints a JSON
+# error with code RUNTIME_UNAVAILABLE and exits 69; callers must then stay read-only.
+#
+# POLA_RUNTIME=auto|node|bun|standalone forces one route (used by host acceptance tests).
+set -u
+
+SELF="$0"
+DIR="$(CDPATH= cd -- "$(dirname -- "$SELF")" && pwd)"
+NAME="$(basename -- "$SELF")"
+BUNDLE="$DIR/$NAME.cjs"
+MODE="${POLA_RUNTIME:-auto}"
+
+os="$(uname -s | tr '[:upper:]' '[:lower:]')"
+arch="$(uname -m)"
+case "$arch" in
+  x86_64|amd64) arch="x64" ;;
+  aarch64|arm64) arch="arm64" ;;
+esac
+NATIVE="$DIR/bin/$os-$arch/$NAME"
+
+node_ok() {
+  command -v "$1" >/dev/null 2>&1 || return 1
+  "$1" -e 'process.exit(Number(process.versions.node.split(".")[0]) >= 18 ? 0 : 1)' >/dev/null 2>&1
+}
+
+if [ "$MODE" = "auto" ] || [ "$MODE" = "node" ]; then
+  for cand in "${POLA_NODE:-}" node nodejs; do
+    [ -n "$cand" ] || continue
+    if [ -f "$BUNDLE" ] && node_ok "$cand"; then
+      POLA_LAUNCHED_VIA="node" exec "$cand" "$BUNDLE" "$@"
+    fi
+  done
+fi
+
+if [ "$MODE" = "auto" ] || [ "$MODE" = "bun" ]; then
+  if [ -f "$BUNDLE" ] && command -v bun >/dev/null 2>&1; then
+    POLA_LAUNCHED_VIA="bun" exec bun "$BUNDLE" "$@"
+  fi
+fi
+
+if [ "$MODE" = "auto" ] || [ "$MODE" = "standalone" ]; then
+  if [ -f "$NATIVE" ]; then
+    run="$NATIVE"
+    if [ ! -x "$run" ]; then chmod +x "$run" 2>/dev/null || true; fi
+    if [ ! -x "$run" ]; then
+      # Read-only plugin folder without the executable bit: run a private copy.
+      tmp="${TMPDIR:-/tmp}/pola-$NAME-$os-$arch-$$"
+      if cp "$NATIVE" "$tmp" 2>/dev/null && chmod 700 "$tmp" 2>/dev/null; then
+        POLA_LAUNCHED_VIA="standalone" "$tmp" "$@"; code=$?
+        rm -f "$tmp"; exit "$code"
+      fi
+    else
+      POLA_LAUNCHED_VIA="standalone" exec "$run" "$@"
+    fi
+  fi
+fi
+
+printf '{"ok":false,"error":{"code":"RUNTIME_UNAVAILABLE","message":"No JavaScript runtime (node >= 18 or bun) and no bundled standalone binary for %s-%s. Writing stays disabled; nothing was installed.","details":{"mode":"%s","platform":"%s-%s"}}}\n' "$os" "$arch" "$MODE" "$os" "$arch"
+exit 69

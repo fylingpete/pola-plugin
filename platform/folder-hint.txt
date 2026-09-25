@@ -1,0 +1,1 @@
+Cowork: start a new task, click the folder icon below the message box (labelled "Add folder" or "Project or folder", depending on the app version), choose your Brain folder (or the project made from it) and allow access when Cowork asks. Claude Code: start the session from the Brain folder (cd into it and run claude), or add it to the running session with /add-dir <path>.

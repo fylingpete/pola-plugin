@@ -1,0 +1,22 @@
+{
+  "host": "cowork",
+  "verified": "2026-09-20 (A0 spike incl. the real product bundle; product acceptance A2/A3 pending)",
+  "verified_version": "desktop app 2.2553.1; engine reported as 2.1.278 and 2.1.42",
+  "execution_mode": "cloud session: entrypoint remote_cowork, env type cloud_default; plugin and CLI in an ephemeral x64 Linux container; selected folder mounted in a local arm64 Linux VM on the user's Mac; no shared file system; device bridge (stage, commit, device shell); no local mode exists; 'Auto' is the approval mode",
+  "install": "upload of the plugin ZIP in Customize → Plugins: accepted; plugin synced to /root/.claude/plugins/synced/<id>/<plugin> in the container",
+  "cli": "container: sh \"<plugin>/tools/pola\" (read-only, writing refused). Device: node \"$HOME/mnt/<folder>/.pola-tools/pola.cjs\" in the device shell — the same bundle, copied once and hash-checked per task",
+  "runtime_next_to_folder": "measured in four sessions: the single-file product CLI runs with node 22.23.2 (linux arm64) on the mounted folder; init, apply, rename, search, status, doctor PASS; state and journal survive new tasks",
+  "paths": "container: cwd /home/claude, home /root; device VM: /sessions/<session-id>/mnt/<folder>, session-specific; Mac: /Users/<name>/…",
+  "config": "container state is lost after the session; only the selected folder persists. POLA_CONFIG_DIR and ~/.config are useless in this mode",
+  "hook": "SessionStart did NOT fire in three sessions; the explicit skill call works",
+  "host_detection": "CLAUDE_CODE_ENTRYPOINT=remote_cowork",
+  "write_gate": "container: CLOSED in code (WRITE_GATE_CLOSED). Device: everyday writing needs no delete permission (rename-based lock, move operation, replace by rename-over); only a change set that really deletes a file is refused with FS_CAPABILITY_MISSING until the user allows deleting. Confirmed in a real Cowork task on 2026-09-20: capture without any delete dialog.",
+  "read": "possible through the device bridge; brain search over a staged copy is possible",
+  "open": [
+    "A3 scenarios through the device route",
+    "a notes folder as a second selected folder",
+    "adding a folder to a running task"
+  ],
+  "device_vm_restrictions": "unlink and rmdir are refused unless the user allows deleting for the task; create, overwrite and rename (also over an existing file) work; mount path changes every task; bridge round trip 2-7 s, so batch commands",
+  "procedure": "platform/cowork.md, section 'Working on the user's device'"
+}
