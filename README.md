@@ -1,13 +1,12 @@
-# Pola: a Second Brain plugin for Claude
+# Pola: Second Brain plugin for Claude
 
-**Bring the full context of your life to every decision, every conversation,
-every next step.**
+**No code needed · Easy setup · Your data stays on your computer**
 
 Your Second Brain knows your conversations, emails, notes and contacts. Claude
 uses that context for every task, not just general knowledge. Set up in 30
-minutes. No code needed.
+minutes.
 
-Free. Your data stays with you. More at [pola.so](https://pola.so).
+Free. More at [pola.so](https://pola.so).
 
 ![A Pola Brain as a graph of people, companies and projects](docs/images/brain-graph.png)
 
@@ -19,10 +18,6 @@ A Second Brain collects it all in one place, so every answer is about your
 work, your people and your decisions.
 
 ## How Pola works
-
-Pola is a plugin for Claude. Your Brain is a folder of text files on your
-computer. With Pola, Claude keeps it up to date and puts it to work for you.
-That way Claude has your full context for every question and every task.
 
 ![Claude connects your Brain, a folder on your computer, to your tools](docs/images/how-it-works.png)
 
